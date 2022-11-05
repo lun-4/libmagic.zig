@@ -105,6 +105,11 @@ fn load(cookie: c.magic_t, path: [:0]const u8) !void {
         logger.warn("failed to load magic file from {s}: {s}", .{ path, magic_error_value });
         return error.MagicLoadFail;
     }
+    const magic_error_value_afterload = c.magic_error(cookie);
+    if (magic_error_value_afterload != null) {
+        logger.warn("failed to load magic file from {s}: {s}", .{ path, magic_error_value_afterload });
+        return error.MagicLoadFail;
+    }
 
     try check(cookie, path);
 }
