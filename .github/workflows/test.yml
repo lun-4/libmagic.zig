@@ -5,7 +5,7 @@ jobs:
     strategy:
       matrix:
         # os: [ubuntu-latest, macos-latest, windows-latest]
-        os: [ubuntu-22.04, windows-latest]
+        os: [ubuntu-22.04]
     runs-on: ${{matrix.os}}
     steps:
       - uses: actions/checkout@v3
@@ -15,5 +15,15 @@ jobs:
       - run: curl -L -w "%{http_code}" -o /usr/local/bin/zigmod https://github.com/nektro/zigmod/releases/download/r83/zigmod-x86_64-linux
       - run: chmod +x /usr/local/bin/zigmod
       - run: zigmod ci
+      - run: zig build test
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: goto-bus-stop/setup-zig@v1.3.0
+        with:
+          version: 0.11.0-dev.6+2943df016
+      - run: curl -L -w "%{http_code}" -o C:\zigmod https://github.com/nektro/zigmod/releases/download/r83/zigmod-x86_64-windows
+      - run: C:\zigmod ci
       - run: zig build test
 
