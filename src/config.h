@@ -272,7 +272,11 @@
 #define HAVE_WORKING_VFORK 1
 
 /* Define to 1 if you have the <xlocale.h> header file. */
-/* #undef HAVE_XLOCALE_H */
+#ifdef __APPLE__
+    #include <string.h>
+    #include <xlocale.h>
+    #define HAVE_XLOCALE_H 1
+#endif
 
 /* Define to 1 if you have the <zlib.h> header file. */
 /* #undef HAVE_ZLIB_H */
