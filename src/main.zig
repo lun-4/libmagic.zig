@@ -106,8 +106,6 @@ const MimeCookie = struct {
     };
 
     pub fn init(allocator: std.mem.Allocator, options: InitOptions) !Self {
-        _ = options;
-
         var cookie = c.magic_open(
             c.MAGIC_MIME_TYPE | c.MAGIC_CHECK | c.MAGIC_SYMLINK | c.MAGIC_ERROR,
         ) orelse return error.MagicCookieFail;
