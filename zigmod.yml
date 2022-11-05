@@ -6,7 +6,7 @@ description: A wrapper for libmagic
 c_include_dirs:
   - src
 dependencies:
-  - src: git https://github.com/file/file tag-FILE5_43
+  - src: git https://github.com/file/file tag-FILE5_42
     c_include_dirs:
       - src
       - ../../../../../../../../src
