@@ -36,6 +36,8 @@ dependencies:
       - src: http http://download.sourceforge.net/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz
         c_include_dirs:
           - .
+        c_source_flags:
+          - -Wall
         c_source_files:
           - regcomp.c
           - regex.c
