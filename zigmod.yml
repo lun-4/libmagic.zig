@@ -35,19 +35,19 @@ dependencies:
       - src/readcdf.c
       - src/fmtcheck.c
       - src/strlcpy.c
-    dependencies:
-      # mingw does not provide posix regex. use libgnurx for that
-      - src: http http://download.sourceforge.net/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz
-        c_include_dirs:
-          - .
-        c_source_flags:
-          - -Wall
-        c_source_files:
-          - regcomp.c
-          - regex.c
-          - regexec.c
-          - regex_internal.c
-        only_os: windows
+    #dependencies:
+    #  # mingw does not provide posix regex. use libgnurx for that
+    #  - src: http http://download.sourceforge.net/mingw/Other/UserContributed/regex/mingw-regex-2.5.1/mingw-libgnurx-2.5.1-src.tar.gz
+    #    c_include_dirs:
+    #      - .
+    #    c_source_flags:
+    #      - -Wall
+    #    c_source_files:
+    #      - regcomp.c
+    #      - regex.c
+    #      - regexec.c
+    #      - regex_internal.c
+    #    only_os: windows
   # only difference for macos is that it provides strlcpy so we dont
   # want to include it in the list here
   - src: git https://github.com/file/file tag-FILE5_42
