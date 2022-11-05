@@ -175,7 +175,7 @@ const MimeCookie = struct {
 };
 
 test "magic time" {
-    var cookie = try MimeCookie.init(std.testing.allocator, .{ .loaing_mode = .static_only });
+    var cookie = try MimeCookie.init(std.testing.allocator, .{ .loading_mode = .static_only });
     defer cookie.deinit();
 
     const mimetype = try cookie.inferFile("src/test_vectors/audio_test_vector.mp3");
