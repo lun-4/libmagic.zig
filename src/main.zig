@@ -126,6 +126,14 @@ const MimeCookie = struct {
             } else {
                 path = system_magic;
             }
+        } else {
+            // if no system, use bundled already
+            path = bundled_magic;
+            if (c.magic_load(cookie, bundled_magic.ptr) == -1) {
+                const magic_error_value_bundle = c.magic_error(cookie);
+                logger.err("failed to load magic file from bundle: {s}", .{magic_error_value_bundle});
+                return error.MagicFileLoadFail;
+            }
         }
 
         if (c.magic_check(cookie, path.ptr) == -1) {
