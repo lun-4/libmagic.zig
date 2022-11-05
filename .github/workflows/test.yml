@@ -23,7 +23,7 @@ jobs:
       - run: C:\zigmod.exe ci
       - run: dir
       - run: zig build test
-  test:
+  test-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
