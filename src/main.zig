@@ -9,7 +9,7 @@ const logger = std.log.scoped(.libmagic);
 
 // Claler owns returned memory.
 fn loadStaticMagic(allocator: std.mem.Allocator) ![:0]const u8 {
-    const datadir = try std.fs.getAppDataDir(allocator, "libmagic");
+    const datadir = try std.fs.getAppDataDir(allocator, "libmagic.zig");
     defer allocator.free(datadir);
     logger.warn("data dir {s}", .{datadir});
 
@@ -20,17 +20,32 @@ fn loadStaticMagic(allocator: std.mem.Allocator) ![:0]const u8 {
         else => return err,
     };
 
-    const database_file_path = try std.fs.path.join(allocator, &[_][]const u8{ datadir, "magic.mgc" });
+    var magic_filename: []const u8 = undefined;
+    comptime {
+        var magic_filename_buf: [32]u8 = undefined;
+        magic_filename = std.fmt.bufPrint(
+            &magic_filename_buf,
+            "magic{d}.mgc",
+            .{c.MAGIC_VERSION},
+        ) catch unreachable;
+    }
+
+    const database_file_path = try std.fs.path.join(allocator, &[_][]const u8{ datadir, magic_filename });
     defer allocator.free(database_file_path);
 
-    logger.warn("dumping static into {s}", .{database_file_path});
+    std.fs.accessAbsolute(database_file_path, .{}) catch |err| switch (err) {
+        error.FileNotFound => {
+            logger.warn("dumping static into {s}", .{database_file_path});
 
-    const database_file = try std.fs.createFileAbsolute(database_file_path, .{ .truncate = true });
-    defer database_file.close();
+            const database_file = try std.fs.createFileAbsolute(database_file_path, .{ .truncate = true });
+            defer database_file.close();
 
-    // lmao who here 7mb binary
-    const magic_file_data = @embedFile("magic.mgc");
-    _ = try database_file.write(magic_file_data);
+            // lmao who here 7mb binary
+            const magic_file_data = @embedFile("magic.mgc");
+            _ = try database_file.write(magic_file_data);
+        },
+        else => return err,
+    };
 
     const database_file_cstr = try std.cstr.addNullByte(allocator, database_file_path);
     return database_file_cstr;
