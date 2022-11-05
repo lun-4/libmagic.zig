@@ -15,7 +15,7 @@ fn loadStaticMagic(allocator: std.mem.Allocator) ![:0]const u8 {
 
     _ = std.fs.openDirAbsolute(datadir, .{}) catch |err| switch (err) {
         error.FileNotFound => {
-            try std.fs.makeDirAbsolute(datadir);
+            try std.fs.cwd().makePath(datadir);
         },
         else => return err,
     };
@@ -90,13 +90,32 @@ fn findSystemMagicFile(allocator: std.mem.Allocator) !?[:0]const u8 {
     return path_cstr;
 }
 
+fn check(cookie: c.magic_t, path: [:0]const u8) !void {
+    logger.warn("checking path {s}", .{path});
+    if (c.magic_check(cookie, path.ptr) == -1) {
+        const magic_error_value = c.magic_error(cookie);
+        logger.err("failed to check magic file {s}: {s}", .{ path, magic_error_value });
+        return error.MagicFileCheckFail;
+    }
+}
+
+fn load(cookie: c.magic_t, path: [:0]const u8) !void {
+    if (c.magic_load(cookie, path.ptr) == -1) {
+        const magic_error_value = c.magic_error(cookie);
+        logger.warn("failed to load magic file from {s}: {s}", .{ path, magic_error_value });
+        return error.MagicLoadFail;
+    }
+
+    try check(cookie, path);
+}
+
 pub const MimeCookie = struct {
     cookie: c.magic_t,
 
     const Self = @This();
 
     const LoadingMode = enum {
-        // TODO system_only,
+        system_only,
         static_only,
         fallback_to_static,
     };
@@ -113,46 +132,33 @@ pub const MimeCookie = struct {
         const maybe_system_magic = if (options.loading_mode == .static_only) null else try findSystemMagicFile(allocator);
         defer if (maybe_system_magic) |system_magic| allocator.free(system_magic);
 
-        const bundled_magic = try loadStaticMagic(allocator);
-        defer allocator.free(bundled_magic);
+        const maybe_bundled_magic = if (options.loading_mode == .system_only) null else try loadStaticMagic(allocator);
+        defer if (maybe_bundled_magic) |bundled_magic| allocator.free(bundled_magic);
 
         // try system magic first,
         // if that fails, fallback to static magic (should always work);
 
-        var path: []const u8 = undefined;
+        var path: [:0]const u8 = undefined;
 
         if (maybe_system_magic) |system_magic| {
             logger.warn("loading magic file {s}", .{system_magic});
-            if (c.magic_load(cookie, system_magic.ptr) == -1) {
-                const magic_error_value = c.magic_error(cookie);
-                logger.warn("failed to load magic file from system: {s}", .{magic_error_value});
-
-                // fallback to static here
-
-                if (c.magic_load(cookie, bundled_magic.ptr) == -1) {
-                    const magic_error_value_bundle = c.magic_error(cookie);
-                    logger.err("failed to load magic file from bundle: {s}", .{magic_error_value_bundle});
-                    return error.MagicFileLoadFail;
-                } else {
+            load(cookie, system_magic) catch |err| {
+                if (maybe_bundled_magic) |bundled_magic| {
+                    try load(cookie, bundled_magic);
                     path = bundled_magic;
+                } else {
+                    return err;
                 }
-            } else {
-                path = system_magic;
-            }
+            };
+            path = system_magic;
         } else {
             // if no system, use bundled already
-            path = bundled_magic;
-            if (c.magic_load(cookie, bundled_magic.ptr) == -1) {
-                const magic_error_value_bundle = c.magic_error(cookie);
-                logger.err("failed to load magic file from bundle: {s}", .{magic_error_value_bundle});
-                return error.MagicFileLoadFail;
+            if (maybe_bundled_magic) |bundled_magic| {
+                try load(cookie, bundled_magic);
+                path = bundled_magic;
+            } else {
+                return error.MagicFileNotFoundInSystem;
             }
-        }
-
-        if (c.magic_check(cookie, path.ptr) == -1) {
-            const magic_error_value = c.magic_error(cookie);
-            logger.err("failed to check magic file: {s}", .{magic_error_value});
-            return error.MagicFileCheckFail;
         }
 
         return MimeCookie{ .cookie = cookie };
@@ -175,7 +181,7 @@ pub const MimeCookie = struct {
 };
 
 test "magic time" {
-    var cookie = try MimeCookie.init(std.testing.allocator, .{ .loading_mode = .static_only });
+    var cookie = try MimeCookie.init(std.testing.allocator, .{});
     defer cookie.deinit();
 
     const mimetype = try cookie.inferFile("src/test_vectors/audio_test_vector.mp3");

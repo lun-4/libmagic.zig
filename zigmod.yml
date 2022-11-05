@@ -3,6 +3,8 @@ name: libmagic.zig
 main: src/main.zig
 license: MIT
 description: A wrapper for libmagic
+c_include_dirs:
+  - src
 dependencies:
   - src: git https://github.com/file/file tag-FILE5_43
     c_include_dirs:
