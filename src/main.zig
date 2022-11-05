@@ -90,7 +90,7 @@ fn findSystemMagicFile(allocator: std.mem.Allocator) !?[:0]const u8 {
     return path_cstr;
 }
 
-const MimeCookie = struct {
+pub const MimeCookie = struct {
     cookie: c.magic_t,
 
     const Self = @This();
