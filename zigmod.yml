@@ -7,6 +7,7 @@ c_include_dirs:
   - src
 dependencies:
   - src: git https://github.com/file/file tag-FILE5_42
+    only_os: linux,windows
     c_include_dirs:
       - src
       - ../../../../../../../../src
@@ -46,4 +47,31 @@ dependencies:
           - regexec.c
           - regex_internal.c
         only_os: windows
-
+  - src: git https://github.com/file/file tag-FILE5_42
+    only_os: macos
+    c_include_dirs:
+      - src
+      - ../../../../../../../../src
+    c_source_flags:
+      - -DHAVE_CONFIG_H=1
+    c_source_files:
+      - src/buffer.c
+      - src/magic.c
+      - src/apprentice.c
+      - src/softmagic.c
+      - src/ascmagic.c
+      - src/encoding.c
+      - src/compress.c
+      - src/is_csv.c
+      - src/is_json.c
+      - src/is_tar.c
+      - src/readelf.c
+      - src/print.c
+      - src/fsmagic.c
+      - src/funcs.c
+      - src/apptype.c
+      - src/der.c
+      - src/cdf.c
+      - src/cdf_time.c
+      - src/readcdf.c
+      - src/fmtcheck.c
