@@ -97,7 +97,7 @@ const MimeCookie = struct {
 
     const LoadingMode = enum {
         // TODO system_only,
-        // TODO static_only,
+        static_only,
         fallback_to_static,
     };
 
@@ -112,7 +112,7 @@ const MimeCookie = struct {
             c.MAGIC_MIME_TYPE | c.MAGIC_CHECK | c.MAGIC_SYMLINK | c.MAGIC_ERROR,
         ) orelse return error.MagicCookieFail;
 
-        const maybe_system_magic = try findSystemMagicFile(allocator);
+        const maybe_system_magic = if (options.loading_mode == .static_only) null else try findSystemMagicFile(allocator);
         defer if (maybe_system_magic) |system_magic| allocator.free(system_magic);
 
         const bundled_magic = try loadStaticMagic(allocator);
@@ -177,7 +177,7 @@ const MimeCookie = struct {
 };
 
 test "magic time" {
-    var cookie = try MimeCookie.init(std.testing.allocator, .{});
+    var cookie = try MimeCookie.init(std.testing.allocator, .{ .loaing_mode = .static_only });
     defer cookie.deinit();
 
     const mimetype = try cookie.inferFile("src/test_vectors/audio_test_vector.mp3");
