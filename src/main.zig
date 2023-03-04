@@ -61,7 +61,7 @@ const POSSIBLE_MAGICDB_PREFIXES = [_][:0]const u8{
 fn findSystemMagicFile(allocator: std.mem.Allocator) !?[:0]const u8 {
     var found_prefix: ?usize = null;
 
-    for (POSSIBLE_MAGICDB_PREFIXES) |prefix, prefix_index| {
+    for (POSSIBLE_MAGICDB_PREFIXES, 0..) |prefix, prefix_index| {
         var dir = std.fs.cwd().openDir(prefix, .{}) catch |err| switch (err) {
             error.FileNotFound, error.NotDir => continue,
             else => return err,
