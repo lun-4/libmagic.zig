@@ -21,14 +21,13 @@ fn loadStaticMagic(allocator: std.mem.Allocator) ![:0]const u8 {
     };
 
     var magic_filename: []const u8 = undefined;
-    comptime {
-        var magic_filename_buf: [32]u8 = undefined;
-        magic_filename = std.fmt.bufPrint(
-            &magic_filename_buf,
-            "magic{d}.mgc",
-            .{c.MAGIC_VERSION},
-        ) catch unreachable;
-    }
+    var magic_filename_buf: [32]u8 = undefined;
+    // TODO move this bufPrint back to comptime
+    magic_filename = std.fmt.bufPrint(
+        &magic_filename_buf,
+        "magic{d}.mgc",
+        .{c.MAGIC_VERSION},
+    ) catch unreachable;
 
     const database_file_path = try std.fs.path.join(allocator, &[_][]const u8{ datadir, magic_filename });
     defer allocator.free(database_file_path);
@@ -47,7 +46,7 @@ fn loadStaticMagic(allocator: std.mem.Allocator) ![:0]const u8 {
         else => return err,
     };
 
-    const database_file_cstr = try std.cstr.addNullByte(allocator, database_file_path);
+    const database_file_cstr = try allocator.dupeZ(u8, database_file_path);
     return database_file_cstr;
 }
 
@@ -86,7 +85,7 @@ fn findSystemMagicFile(allocator: std.mem.Allocator) !?[:0]const u8 {
     const magicdb_path = try std.fmt.allocPrint(allocator, "{s}/magic", .{magicdb_prefix});
     defer allocator.free(magicdb_path);
 
-    const path_cstr = try std.cstr.addNullByte(allocator, magicdb_path);
+    const path_cstr = try allocator.dupeZ(u8, magicdb_path);
     return path_cstr;
 }
 

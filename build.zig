@@ -15,7 +15,7 @@ pub fn build(b: *std.build.Builder) void {
         .target = target,
     });
 
-    lib.install();
+    b.installArtifact(lib);
     deps.addAllTo(lib);
 
     var test_exe = b.addTest(.{
@@ -24,8 +24,10 @@ pub fn build(b: *std.build.Builder) void {
         .optimize = optimize,
     });
 
+    const run_test = b.addRunArtifact(test_exe);
+
     deps.addAllTo(test_exe);
 
     const test_step = b.step("test", "Run library tests");
-    test_step.dependOn(&test_exe.step);
+    test_step.dependOn(&run_test.step);
 }
