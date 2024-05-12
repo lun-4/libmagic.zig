@@ -129,7 +129,7 @@ pub const MimeCookie = struct {
     };
 
     pub fn init(allocator: std.mem.Allocator, options: InitOptions) !Self {
-        var cookie = c.magic_open(
+        const cookie = c.magic_open(
             c.MAGIC_MIME_TYPE | c.MAGIC_CHECK | c.MAGIC_SYMLINK | c.MAGIC_ERROR,
         ) orelse return error.MagicCookieFail;
 
@@ -185,7 +185,7 @@ pub const MimeCookie = struct {
 };
 
 test "magic time" {
-    var cookie = try MimeCookie.init(std.testing.allocator, .{});
+    var cookie = try MimeCookie.init(std.testing.allocator, .{ .loading_mode = .static_only });
     defer cookie.deinit();
 
     const mimetype = try cookie.inferFile("src/test_vectors/audio_test_vector.mp3");
