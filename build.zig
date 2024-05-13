@@ -21,6 +21,12 @@ pub fn build(b: *std.Build) void {
 
     lib.linkLibrary(dep.artifact("libmagic"));
 
+    _ = b.addModule("libmagic", .{
+        .root_source_file = .{ .path = "src/main.zig" },
+        .optimize = optimize,
+        .target = target,
+    });
+
     b.installArtifact(lib);
 
     const test_exe = b.addTest(.{
