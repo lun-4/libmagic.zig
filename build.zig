@@ -14,7 +14,7 @@ pub fn build(b: *std.Build) void {
 
     const lib = b.addStaticLibrary(.{
         .name = "libmagic.zig",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .optimize = optimize,
         .target = target,
     });
@@ -22,7 +22,7 @@ pub fn build(b: *std.Build) void {
     lib.linkLibrary(dep.artifact("libmagic"));
 
     const mod = b.addModule("libmagic", .{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .optimize = optimize,
         .target = target,
     });
@@ -31,7 +31,7 @@ pub fn build(b: *std.Build) void {
     b.installArtifact(lib);
 
     const test_exe = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
