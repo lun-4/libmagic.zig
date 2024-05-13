@@ -1,5 +1,4 @@
 const std = @import("std");
-const deps = @import("deps.zig");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
