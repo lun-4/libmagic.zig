@@ -4,8 +4,8 @@
     .minimum_zig_version = "0.12.0",
     .dependencies = .{
         .libmagic = .{
-            .url = "https://github.com/lun-4/file/archive/947472e930f5a3d54c59e710997159927f4b5eee.tar.gz",
-            .hash = "12202b523979650f48ed9d6a7ed263a28772f12b6c552cf72011fc6b979fb15e9090",
+            .url = "https://github.com/lun-4/file/archive/f600cf9d09e53b44b34a772e9b4c17c623433b24.tar.gz",
+            .hash = "12206743bc8c3342075ebdae6b99d8a8ca231780b22923c0bcfa6ab863b90accbbaf",
         },
     },
     .paths = .{
