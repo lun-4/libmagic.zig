@@ -4,3 +4,4 @@ zig-cache/
 deps.zig
 
 *ccls-cache
+.zig-cache/
