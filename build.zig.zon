@@ -1,7 +1,8 @@
 .{
-    .name = "libmagic.zig",
-    .version = "0.1.0",
-    .minimum_zig_version = "0.12.0",
+    .name = .libmagic_zig,
+    .fingerprint = 0xbf2aac3bf0cc23f,
+    .version = "0.1.1",
+    .minimum_zig_version = "0.14.0",
     .dependencies = .{
         .libmagic = .{
             .url = "https://github.com/lun-4/file/archive/f600cf9d09e53b44b34a772e9b4c17c623433b24.tar.gz",
